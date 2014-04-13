@@ -1,9 +1,10 @@
 spotifyripper
 =============
 
-small ripper script for spotify (rips playlists to mp3 and includes ID3 tags) 
+based on robbeofficial's work: 
+a small player and ripper script for spotify (rips playlists to mp3 and includes ID3 tags) 
 
-note that stream ripping violates the ToC's of libspotify!
+NOTE: stream ripping violates the ToS of libspotify, spotify and, possibly, local copyright laws. Don't do that.
 
 usage
 -----
@@ -24,19 +25,20 @@ features
 
 prerequisites:
 --------------
-* libspotify (download at https://developer.spotify.com/technologies/libspotify/)
+* lame, python-dev and eyeD3 installed (via apt-get)
 
-* pyspotify (sudo pip install -U pyspotify, requires python-dev)
+* libspotify (download at https://developer.spotify.com/technologies/libspotify/, install via included make.install). you may need other -dev packages, check make errors if they occur.
+
+* pyspotify (sudo pip install -I pyspotify==1.11)
 
 * spotify binary appkey (download at developer.spotify.com and copy to wd, requires premium!)
 
-* lame (sudo apt-get install lame)
-
-* eyeD3 (pip install eyeD3)
 
 TODO
 ----
+- [ ] check AndersTornkvist fork for sensible improvements
 - [ ] skip exisiting track (avoid / completed tracks / completed = successful id3)
 - [ ] detect if other spotify instance is interrupting
 - [ ] add album supprt : spotify:album:1UnRYaeCev9JVKEHWBEgHe
+- [ ] update to support pyspotify v2.x (breaks module calls)
 
