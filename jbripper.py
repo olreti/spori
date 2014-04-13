@@ -4,16 +4,21 @@
 from subprocess import call, Popen, PIPE
 from spotify import Link, Image
 from jukebox import Jukebox, container_loaded
+from clint.textui import colored, progress
 import os, sys
 import threading
 import time
+from time import sleep
+from random import random
 
 playback = False # set if you want to listen to the tracks that are currently ripped (start with "padsp ./jbripper.py ..." if using pulse audio)
 
 pipe = None
 ripping = False
+progressiterator = 1
 end_of_track = threading.Event()
 
+# braucht man das??
 def printstr(str): # print without newline
     sys.stdout.write(str)
     sys.stdout.flush()
@@ -25,10 +30,12 @@ def rip_init(session, track):
     global pipe, ripping
     num_track = "%02d" % (track.index(),)
     mp3file = track.name()+".mp3"
-    directory = os.getcwd() + "/" + track.artists()[0].name() + "/" + track.album().name() + "/"
+    mp3file = mp3file.replace("?", " ")
+    directory = os.getcwd() + "/eingang/" + track.artists()[0].name() + "/" + track.album().name() + "/"
+    directory = directory.replace("?", " ")
     if not os.path.exists(directory):
         os.makedirs(directory)
-    printstr("ripping " + mp3file + " ...")
+    print colored.red("ripping " + mp3file + " ...")
     p = Popen("lame --silent -V2 -h -r - \""+ directory + mp3file+"\"", stdin=PIPE, shell=True)
     pipe = p.stdin
     ripping = True
@@ -36,23 +43,42 @@ def rip_init(session, track):
 def rip_terminate(session, track):
     global ripping
     if pipe is not None:
-        print(' done!')
+        print colored.green(' done!')
         pipe.close()
     ripping = False    
 
+##################################
+
 def rip(session, frames, frame_size, num_frames, sample_type, sample_rate, channels):
+    global progressiterator
     if ripping:
-        printstr('.')
+	if progressiterator == 1:
+		printstr("\r Recording... | ")
+		progressiterator += 1
+	elif progressiterator == 2:
+		printstr("\r Recording... / ")
+		progressiterator += 1
+	elif progressiterator == 3:
+		printstr("\r Recording... - ")
+		progressiterator += 1
+	elif progressiterator == 4:
+		printstr("\r Recording... \ ")
+		progressiterator = 1
+	else:
+		printstr("\r Recording........... | ")
+		progressiterator = 1
         pipe.write(frames);
 
 def rip_id3(session, track): # write ID3 data
     num_track = "%02d" % (track.index(),)
     mp3file = track.name()+".mp3"
+    mp3file = mp3file.replace("?", " ")
     artist = track.artists()[0].name()
     album = track.album().name()
     title = track.name()
     year = track.album().year()
-    directory = os.getcwd() + "/" + track.artists()[0].name() + "/" + track.album().name() + "/"
+    directory = os.getcwd() + "/eingang/" + track.artists()[0].name() + "/" + track.album().name() + "/"
+    directory = directory.replace("?", " ")
 
     # download cover
     image = session.image_create(track.album().cover())
